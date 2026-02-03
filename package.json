@@ -1,0 +1,21 @@
+{
+  "name": "pixelheart-backend",
+  "version": "1.0.0",
+  "description": "Pixelheart Backend",
+  "keywords": [
+    "nodejs"
+  ],
+  "license": "ISC",
+  "author": "Siftain",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node arc/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.1.5",
+    "validator": "^13.15.26"
+  }
+}
