@@ -1,3 +1,4 @@
+const validateSignUpData = require('../utils/validation.js');
 const express = require('express');
 const {connectToDB} = require('./config/database.js');
 const User = require('./models/user.js');
@@ -8,7 +9,13 @@ app.use(express.json());
 const PORT = 2222;
 
 app.post('/signup' , async (req,res) => {
+
+    //Validate Signup Data
+    
+    //Encrypt Password
+
     try{
+        validateSignUpData(req);
         
         const users = await User.findOne({emailId : req.body.emailId});
         if(users)
