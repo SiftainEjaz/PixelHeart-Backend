@@ -1,5 +1,6 @@
 const validateSignUpData = require('../utils/validation.js');
 const express = require('express');
+const bcrypt = require('bcrypt');
 const {connectToDB} = require('./config/database.js');
 const User = require('./models/user.js');
 
@@ -9,16 +10,11 @@ app.use(express.json());
 const PORT = 2222;
 
 app.post('/signup' , async (req,res) => {
-
-    //Validate Signup Data
-    
-    //Encrypt Password
-
     try{
         validateSignUpData(req);
         
-        const users = await User.findOne({emailId : req.body.emailId});
-        if(users)
+        const existingUser = await User.findOne({emailId : req.body.emailId});
+        if(existingUser)
         {
             res.status(400).json({
                 "message" : "User already exists!"
@@ -26,8 +22,22 @@ app.post('/signup' , async (req,res) => {
         }
         else
         {
-            const user = new User(req.body);
-            await user.save();
+            const plainPassword = req.body.password;
+            const {firstName, lastName, emailId, gender, age, about, photoUrl} = req.body;
+            
+            const hashPassword = await bcrypt.hash(plainPassword,10);
+            
+            const newUser = new User({
+                firstName,
+                lastName,
+                emailId,
+                password : hashPassword,
+                gender,
+                age,
+                photoUrl,
+                about
+            });
+            await newUser.save();
 
             res.json({
                 "message" : "User added successfully!!"
@@ -38,6 +48,42 @@ app.post('/signup' , async (req,res) => {
         res.status(400).json({
             "message" : "Something went wrong!!",
             "error" : err.message
+        })
+    }
+})
+
+app.post('/login', async (req,res) => {
+    try{
+        const {emailId, password} = req.body;
+        if(!emailId || !password)
+        {
+            throw new Error("Please enter the credentials!");
+        }
+        const existingUser = await User.findOne({emailId});
+
+        if(!existingUser){
+            throw new Error("User doesn't exists! Please sign up!");
+        }
+
+        else{
+            const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+            if(isPasswordValid){
+                res.json({
+                    "message" : "Login Successful!",
+                    existingUser
+                })
+            }
+
+            else{
+                throw new Error("Invalid Credentials!");
+            }
+        }
+
+
+    }
+    catch(err){
+        res.status(404).json({
+            "message" : err.message
         })
     }
 })

@@ -19,12 +19,13 @@ const validateSignUpData = function (req) {
         throw new Error('Minimum age limit is 18!');
     }
 
-    if(gender && !["Male","Female","Others"].includes(gender)){
+    if(gender && !["Male","Female","Others"].includes(gender)){   
         throw new Error('Invalid gender type!')
     }
 
-    if(!validator.isURL(photoUrl)){
-        throw new Error('Please enter Photo URL!')
+    if(photoUrl && !validator.isURL(photoUrl)){
+
+        throw new Error('Please enter correct Photo URL!')
     }
     
 }
