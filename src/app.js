@@ -1,11 +1,14 @@
 const validateSignUpData = require('../utils/validation.js');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 const {connectToDB} = require('./config/database.js');
 const User = require('./models/user.js');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 const PORT = 2222;
 
@@ -68,9 +71,13 @@ app.post('/login', async (req,res) => {
         else{
             const isPasswordValid = await bcrypt.compare(password, existingUser.password);
             if(isPasswordValid){
+
+                const token = await jwt.sign({_id : existingUser._id},"Pixelheart@$9870");
+
+                res.cookie("token",token);
+
                 res.json({
                     "message" : "Login Successful!",
-                    existingUser
                 })
             }
 
@@ -78,14 +85,28 @@ app.post('/login', async (req,res) => {
                 throw new Error("Invalid Credentials!");
             }
         }
-
-
     }
     catch(err){
         res.status(404).json({
             "message" : err.message
         })
     }
+})
+
+
+app.get('/profile', async (req,res) => {
+    console.log(req.cookies);
+
+    const {token} = req.cookies;
+
+    const decodedPayload = jwt.verify(token,"Pixelheart@$9870");
+    console.log(decodedPayload);
+
+    const {_id} = decodedPayload;
+    const user = await User.findById(_id);
+    
+    res.json(user);
+
 })
 
 app.get('/feed' , async (req,res) => {
