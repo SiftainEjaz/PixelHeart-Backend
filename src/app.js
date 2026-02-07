@@ -111,69 +111,6 @@ app.get('/profile', userAuth ,async (req, res) => {
 })
 
 
-app.get('/feed', userAuth ,async (req, res) => {
-    try {
-        const users = await User.find();
-        res.json(users);
-    }
-    catch (err) {
-        res.status(400).json({
-            "message": "Something went wrong!",
-            "error": err.message
-        })
-    }
-})
-
-
-app.delete('/user', async (req, res) => {
-    const userId = req.body.userId;
-
-    try {
-        const user = await User.findByIdAndDelete(userId);
-        res.json({
-            "message": "User deleted successfully!"
-        })
-    }
-    catch (err) {
-        res.status(400).json({
-            "message": "Something went wrong!",
-            "error": err.message
-        })
-    }
-})
-
-
-app.patch('/user/:userId', userAuth ,async (req, res) => {
-    const dataToBeUpdated = req.body;
-    const userId = req.params?.userId;
-
-    try {
-        const Allowed_Updates = ["firstName", "lastName", "about", "skills", "age", "photoUrl", "gender", "password"];
-
-        const isUpdateAllowed = Object.keys(dataToBeUpdated).every((key) => Allowed_Updates.includes(key));
-
-        if (!isUpdateAllowed) {
-            throw new Error("Updates not allowed for added fields!");
-        }
-        if (dataToBeUpdated?.skills?.length > 10) {
-            throw new Error("Maximum of 10 skills can be added!");
-        }
-        else {
-            const user = await User.findByIdAndUpdate(userId, dataToBeUpdated, { runValidators: true });
-            res.json({
-                "message": "User updated successfully!"
-            })
-        }
-    }
-    catch (err) {
-        res.status(401).json({
-            "message": "Something went wrong!",
-            "error": err.message
-        })
-    }
-})
-
-
 connectToDB()
     .then(() => {
         console.log("Database connection established..");
