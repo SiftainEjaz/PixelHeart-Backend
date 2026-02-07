@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const { connectToDB } = require('./config/database.js');
 const User = require('./models/user.js');
 const jwt = require('jsonwebtoken');
-const {userAuth} = require('./middlewares/auth.js');
+const {userAuth} = require('./middlewares/userAuth.js');
 
 const app = express();
 app.use(express.json());
@@ -111,7 +111,7 @@ app.get('/profile', userAuth ,async (req, res) => {
 })
 
 
-app.get('/feed', async (req, res) => {
+app.get('/feed', userAuth ,async (req, res) => {
     try {
         const users = await User.find();
         res.json(users);
@@ -143,7 +143,7 @@ app.delete('/user', async (req, res) => {
 })
 
 
-app.patch('/user/:userId', async (req, res) => {
+app.patch('/user/:userId', userAuth ,async (req, res) => {
     const dataToBeUpdated = req.body;
     const userId = req.params?.userId;
 
