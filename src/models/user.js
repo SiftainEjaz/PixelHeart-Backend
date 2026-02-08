@@ -18,6 +18,9 @@ const userSchema = new mongoose.Schema({
             if(value<18){
                 throw new Error("Minimum age should be 18!")
             }
+            else if(value>60){
+                throw new Error("Maximum age should be 60!");
+            }
         }
     },
     emailId : {

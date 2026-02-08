@@ -5,7 +5,8 @@ const bcrypt = require('bcrypt');
 const { connectToDB } = require('./config/database.js');
 const User = require('./models/user.js');
 const jwt = require('jsonwebtoken');
-const {userAuth} = require('./middlewares/userAuth.js');
+const { userAuth } = require('./middlewares/userAuth.js');
+const {authRouter} = require('./routes/authRouter.js');
 
 const app = express();
 app.use(express.json());
@@ -13,47 +14,49 @@ app.use(cookieParser());
 
 const PORT = 2222;
 
-app.post('/signup', async (req, res) => {
-    try {
-        validateSignUpData(req);
+app.use('/' , authRouter);
 
-        const existingUser = await User.findOne({ emailId: req.body.emailId });
-        if (existingUser) {
-            res.status(400).json({
-                "message": "User already exists!"
-            })
-        }
-        else {
-            const plainPassword = req.body.password;
-            const { firstName, lastName, emailId, gender, age, about, photoUrl, skills } = req.body;
+// app.post('/signup', async (req, res) => {
+//     try {
+//         validateSignUpData(req);
 
-            const hashPassword = await bcrypt.hash(plainPassword, 10);
+//         const existingUser = await User.findOne({ emailId: req.body.emailId });
+//         if (existingUser) {
+//             res.status(400).json({
+//                 "message": "User already exists!"
+//             })
+//         }
+//         else {
+//             const plainPassword = req.body.password;
+//             const { firstName, lastName, emailId, gender, age, about, photoUrl, skills } = req.body;
 
-            const newUser = new User({
-                firstName,
-                lastName,
-                emailId,
-                password: hashPassword,
-                gender,
-                age,
-                photoUrl,
-                about,
-                skills
-            });
-            await newUser.save();
+//             const hashPassword = await bcrypt.hash(plainPassword, 10);
 
-            res.json({
-                "message": "User added successfully!!"
-            })
-        }
-    }
-    catch (err) {
-        res.status(400).json({
-            "message": "Something went wrong!!",
-            "error": err.message
-        })
-    }
-})
+//             const newUser = new User({
+//                 firstName,
+//                 lastName,
+//                 emailId,
+//                 password: hashPassword,
+//                 gender,
+//                 age,
+//                 photoUrl,
+//                 about,
+//                 skills
+//             });
+//             await newUser.save();
+
+//             res.json({
+//                 "message": "User added successfully!!"
+//             })
+//         }
+//     }
+//     catch (err) {
+//         res.status(400).json({
+//             "message": "Something went wrong!!",
+//             "error": err.message
+//         })
+//     }
+// })
 
 app.post('/login', async (req, res) => {
     try {
@@ -71,7 +74,11 @@ app.post('/login', async (req, res) => {
             const isPasswordValid = await bcrypt.compare(password, existingUser.password);
             if (isPasswordValid) {
 
-                const token = await jwt.sign({ _id: existingUser._id }, "Secure!@$1560");
+                const token = await jwt.sign(
+                    { _id: existingUser._id }, 
+                    "Secure!@$1560",                 
+                    {  expiresIn: "1d" }
+                );
 
                 res.cookie("token", token);
 
@@ -93,7 +100,7 @@ app.post('/login', async (req, res) => {
 })
 
 
-app.get('/profile', userAuth ,async (req, res) => {
+app.get('/profile', userAuth, async (req, res) => {
 
     try {
         const existingUser = req.existingUser;
@@ -110,7 +117,7 @@ app.get('/profile', userAuth ,async (req, res) => {
     }
 })
 
-
+ 
 connectToDB()
     .then(() => {
         console.log("Database connection established..");

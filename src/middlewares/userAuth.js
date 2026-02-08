@@ -22,9 +22,14 @@ const userAuth = async (req,res,next)=>{
         }
     }
     catch(err){
-        res.status(400).json({
+        if(err.message === 'jwt expired'){
+            res.status(404).json({"message" : "Session expired. Please Login!"});
+        }
+        else{
+            res.status(400).json({
             "message" : err.message
         })
+        }
     }
 }
 

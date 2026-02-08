@@ -1,14 +1,22 @@
 const validator = require('validator');
 
 const validateSignUpData = function (req) {
-    const {firstName, lastName, age, emailId, password, gender, photoUrl} = req.body;
+    const {firstName, lastName, age, emailId, password, gender, photoUrl, skills} = req.body;
 
     if(!firstName || !lastName){
         throw new Error('Please enter the Name!');
     }
 
+    if(!emailId){
+        throw new Error('Please enter the email ID!');
+    }
+
     if(!validator.isEmail(emailId)){
         throw new Error('Please enter a valid Email ID!');
+    }
+
+    if(!password){
+        throw new Error('Please enter the password!');
     }
 
     if(!validator.isStrongPassword(password)){
@@ -17,6 +25,10 @@ const validateSignUpData = function (req) {
 
     if(age && age<18){
         throw new Error('Minimum age limit is 18!');
+    }
+
+    if(age && age>60){
+        throw new Error('Maximum age limit is 60');
     }
 
     if(gender && !["Male","Female","Others"].includes(gender)){   
