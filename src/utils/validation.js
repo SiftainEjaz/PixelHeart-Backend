@@ -79,4 +79,6 @@ const validateUpdateData = function (req) {
 
 }
 
+
+
 module.exports = { validateSignUpData, validateUpdateData };
