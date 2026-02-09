@@ -13,25 +13,6 @@ const PORT = 2222;
 
 app.use('/' , authRouter);
 app.use('/profile',profileRouter);
-
-
-// app.get('/profile', userAuth, async (req, res) => {
-
-//     try {
-//         const existingUser = req.existingUser;
-
-//         res.json({
-//             "message": "Profile fetched successfully!",
-//             existingUser
-//         });
-//     }
-//     catch (err) {
-//         res.status(400).json({
-//             "message": err.message
-//         })
-//     }
-// })
-
  
 connectToDB()
     .then(() => {
