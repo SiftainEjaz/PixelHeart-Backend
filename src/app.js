@@ -1,9 +1,9 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const { connectToDB } = require('./config/database.js');
-const { userAuth } = require('./middlewares/userAuth.js');
 const {authRouter} = require('./routes/authRouter.js');
 const {profileRouter} = require('./routes/profileRouter.js');
+const {connectionRequestRouter} =require('./routes/connectionRequestRouter.js');
 
 const app = express();
 app.use(express.json());
@@ -13,6 +13,7 @@ const PORT = 2222;
 
 app.use('/' , authRouter);
 app.use('/profile',profileRouter);
+app.use('/request', connectionRequestRouter);
  
 connectToDB()
     .then(() => {
