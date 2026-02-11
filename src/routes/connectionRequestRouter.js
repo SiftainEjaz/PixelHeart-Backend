@@ -60,7 +60,7 @@ connectionRequestRouter.post('/send/:status/:toUserId', userAuth, async (req, re
     }
 })
 
-connectionRequestRouter.post('/review/:status/:fromUserId', userAuth, async (req, res) => {
+connectionRequestRouter.patch('/review/:status/:fromUserId', userAuth, async (req, res) => {
     try {
       
         const loggedInUser = req.existingUser;

@@ -14,7 +14,7 @@ STATUS - interested or ignored, accepted or rejected
 
 ## connectionRequestsRouter
 - POST /request/send/:status/:toUserId [status = "interested" or "ignored"]
-- POST /request/review/:status/:fromUserId [status : "accepted" or "rejected"]
+- PATCH /request/review/:status/:fromUserId [status : "accepted" or "rejected"]
 
 - GET /connections
 - GET /requests/received
