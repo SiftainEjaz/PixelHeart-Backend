@@ -14,22 +14,22 @@ connectionRequestRouter.post('/send/:status/:toUserId', userAuth, async (req, re
         if (!["interested", "ignored"].includes(status)) {
             throw new Error(`${status} is an invalid status!`)
         }
-        
+
         const receiver = await User.findById(toUserId);
         if (!receiver) {
             throw new Error("Invalid User!");
         }
         const existingRequest = await ConnectionRequest.findOne({
-            $or : [
-                {fromUserId : toUserId, toUserId : fromUserId},
-                {fromUserId : fromUserId, toUserId : toUserId}
+            $or: [
+                { fromUserId: toUserId, toUserId: fromUserId },
+                { fromUserId: fromUserId, toUserId: toUserId }
             ]
         });
-        
-        if(existingRequest){
+
+        if (existingRequest) {
             throw new Error("Connection request already exists!");
         }
-        
+
 
         const connectionRequest = new ConnectionRequest({
             fromUserId,
@@ -41,7 +41,7 @@ connectionRequestRouter.post('/send/:status/:toUserId', userAuth, async (req, re
 
         if (status === "interested") {
             res.json({
-                message: `Connection Request has been sent to ${receiver.firstName}`,
+                message: `You are interested in ${receiver.firstName}. Connection Request has been sent.`,
                 data
             })
         }
@@ -59,5 +59,6 @@ connectionRequestRouter.post('/send/:status/:toUserId', userAuth, async (req, re
         })
     }
 })
+
 
 module.exports = { connectionRequestRouter };
