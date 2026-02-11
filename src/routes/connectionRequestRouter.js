@@ -60,5 +60,38 @@ connectionRequestRouter.post('/send/:status/:toUserId', userAuth, async (req, re
     }
 })
 
+connectionRequestRouter.post('/review/:status/:fromUserId', userAuth, async (req, res) => {
+    try {
+      
+        const loggedInUser = req.existingUser;
+        const fromUserId = req.params.fromUserId;
+        const status = req.params.status;
+        if (!["accepted", "rejected"].includes(status)) {
+            throw new Error(`${status} is of invalid type!`);
+        }
+
+        const findUser = await User.findById(fromUserId);
+        if (!findUser) {
+            throw new Error("User doesn't exists in the platform!");
+        }
+        const connectionRequest = await ConnectionRequest.findOneAndUpdate({ fromUserId : fromUserId ,toUserId: loggedInUser._id, status: "interested" },{status : status},{returnDocument : "after" , runValidators : true});
+        
+        if (!connectionRequest) {
+            throw new Error("No request found!");
+        }
+        
+        res.json({
+            message: `${findUser.firstName}'s connection request has been ${status}!`,
+            connectionRequest
+        })
+
+    }
+    catch (err) {
+        res.status(400).json({
+            error: err.message
+        })
+    }
+})
+
 
 module.exports = { connectionRequestRouter };
