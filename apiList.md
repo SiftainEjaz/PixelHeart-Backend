@@ -16,6 +16,7 @@ STATUS - interested or ignored, accepted or rejected
 - POST /request/send/:status/:toUserId [status = "interested" or "ignored"]
 - PATCH /request/review/:status/:fromUserId [status : "accepted" or "rejected"]
 
-- GET /connections
-- GET /requests/received
-- GET /feed
+## userRouter
+- GET /user/connections
+- GET /user/requests/received
+- GET /user/feed
