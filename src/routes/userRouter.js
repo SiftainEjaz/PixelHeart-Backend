@@ -7,17 +7,31 @@ const ConnectionRequest = require('../models/connectionRequest.js');
 userRouter.get('/connections', userAuth, async (req, res) => {
     try {
         const loggedInUser = req.existingUser;
-        const connections = await ConnectionRequest.find(
-            { toUserId: loggedInUser._id, status: "accepted" }
-        ).populate("fromUserId", ["firstName", "lastName"]);
+        const connections = await ConnectionRequest.find({
+            $or: [
+                { fromUserId: loggedInUser._id, status: "accepted" },
+                { toUserId: loggedInUser._id, status: "accepted" }
+            ]
+        })
+            .populate("fromUserId", ["firstName", "lastName", "about", "age", "skills", "photoUrl"])
+            .populate("toUserId", "firstName lastName about age skills photoUrl");
 
-        if(connections.length == 0){
+        if (connections.length == 0) {
             throw new Error("No connections found!");
         }
 
+
+        const connectionsData = (connections).map((connection) => {
+            if ((connection.fromUserId._id).equals(loggedInUser._id)) {
+                return connection.toUserId;
+            }
+
+            return connection.fromUserId;
+        })
+
         res.json({
-            message : `${connections.length} connection(s) found!`,
-            connections
+            message: `${connections.length} connection(s) found!`,
+            connectionsData
         })
     }
     catch (err) {
