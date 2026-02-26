@@ -32,7 +32,7 @@ profileRouter.patch('/update', userAuth, async (req, res) => {
 
         res.json({
             message: `${existingUser.firstName},your profile has been updated successfully!`,
-            data : updatedUser
+            data: updatedUser
         })
 
     }
@@ -43,37 +43,36 @@ profileRouter.patch('/update', userAuth, async (req, res) => {
     }
 })
 
-profileRouter.patch('/password' , userAuth, async (req,res) => {
-    try{
+profileRouter.patch('/password', userAuth, async (req, res) => {
+    try {
         const newPassword = req.body.password;
         const existingUser = req.existingUser;
 
         const oldHashPassword = existingUser.password;
-        const isPasswordSame = await bcrypt.compare(newPassword,oldHashPassword);
+        const isPasswordSame = await bcrypt.compare(newPassword, oldHashPassword);
 
-        if(isPasswordSame){
+        if (isPasswordSame) {
             throw new Error("Same Password!! Please enter a new password.");
         }
 
-        if(!validator.isStrongPassword(newPassword)){
+        if (!validator.isStrongPassword(newPassword)) {
             throw new Error("Please enter a Strong Password!");
         }
 
-        const newHashPassword = await bcrypt.hash(newPassword,10);
-        await User.findByIdAndUpdate(existingUser._id,{password : newHashPassword},{runValidators : true});
+        const newHashPassword = await bcrypt.hash(newPassword, 10);
+        await User.findByIdAndUpdate(existingUser._id, { password: newHashPassword }, { runValidators: true });
 
         res.json({
-            message : `Password has been updated!`
+            message: `Password has been updated!`
         })
     }
 
-    catch(err){
+    catch (err) {
         res.status(404).json({
-            message : err.message
+            message: err.message
         })
     }
 
 })
-
 
 module.exports = { profileRouter };

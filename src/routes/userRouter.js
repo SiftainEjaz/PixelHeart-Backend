@@ -26,7 +26,6 @@ userRouter.get('/connections', userAuth, async (req, res) => {
             if ((connection.fromUserId._id).equals(loggedInUser._id)) {
                 return connection.toUserId;
             }
-
             return connection.fromUserId;
         })
 
@@ -71,25 +70,13 @@ userRouter.get('/requests/received', userAuth, async (req, res) => {
 
 userRouter.get('/feed', userAuth, async (req, res) => {
     try {
-        //users whom we have sent connection request
-        //users from whom we have received connection request
-        //users who are a connection
-        //users whom we have rejected
 
         const loggedInUser = req.existingUser;
 
-        // const connections = await ConnectionRequest.find({
-        //     $or: [
-        //         { fromUserId: loggedInUser._id, status: "accepted" },
-        //         { toUserId: loggedInUser._id, status: "accepted" }
-        //     ]
-        // })
-
-        // const requestReceived = await ConnectionRequest.find({ toUserId: loggedInUser._id, status: "interested" });
-
-        // const requestSent = await ConnectionRequest.find({ fromUserId: loggedInUser._id, status: "interested" });
-
-        // const ignoredUsers = await ConnectionRequest.find({ fromUserId: loggedInUser._id, status: "ignored" });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        limit = limit > 50 ? 50 : limit;
+        const skip = (page - 1) * limit;
 
         const connectionRequests = await ConnectionRequest.find({
             $or: [
@@ -98,7 +85,6 @@ userRouter.get('/feed', userAuth, async (req, res) => {
             ]
         }).select("fromUserId toUserId");
 
-
         const hideUsersFromFeed = new Set();
 
         connectionRequests.forEach((connectionRequest) => {
@@ -106,14 +92,12 @@ userRouter.get('/feed', userAuth, async (req, res) => {
             hideUsersFromFeed.add(connectionRequest.toUserId.toString());
         })
 
-        // console.log(hideUsersFromFeed);
-
         const users = await User.find({
             $and: [
                 { _id: { $ne: loggedInUser._id } },
                 { _id: { $nin: Array.from(hideUsersFromFeed) } }
             ]
-        }).select("firstName lastName age about skills gender");
+        }).select("firstName lastName age about skills gender").skip(skip).limit(limit);
 
         res.send(users);
     }
