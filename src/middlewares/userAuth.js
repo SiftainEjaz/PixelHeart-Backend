@@ -5,7 +5,9 @@ const userAuth = async (req,res,next)=>{
     try{
         const {token} = req.cookies;
         if(!token){
-            throw new Error("Please Login!");
+            return res.status(401).json({
+                message : "Session Expired. Please Login!"
+            })
         }
         else{
             const decodedPayload = jwt.verify(token,"Secure!@$1560");
