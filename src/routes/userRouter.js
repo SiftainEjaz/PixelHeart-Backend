@@ -14,11 +14,15 @@ userRouter.get('/connections', userAuth, async (req, res) => {
                 { toUserId: loggedInUser._id, status: "accepted" }
             ]
         })
-            .populate("fromUserId", ["firstName", "lastName", "about", "age", "skills", "photoUrl"])
-            .populate("toUserId", "firstName lastName about age skills photoUrl");
+            .populate("fromUserId", ["firstName", "lastName", "about", "age", "gender", "skills", "photoUrl"])
+            .populate("toUserId", "firstName lastName about age skills gender photoUrl");
 
         if (connections.length == 0) {
-            throw new Error("No connections found!");
+            res.json({
+                message: "No Connections found!"
+            })
+
+            return;
         }
 
 
@@ -47,11 +51,15 @@ userRouter.get('/requests/received', userAuth, async (req, res) => {
 
         const connectionRequests = await ConnectionRequest.find(
             { toUserId: loggedInUser._id, status: "interested" })
+            .select("fromUserId")
             .populate("fromUserId", "firstName lastName about age skills photoUrl");
 
 
         if (connectionRequests.length == 0) {
-            throw new Error("No pending requests!");
+            res.json({
+                message : "No Pending Requests!"
+            })
+            return;
         }
 
         res.json({
@@ -97,13 +105,13 @@ userRouter.get('/feed', userAuth, async (req, res) => {
                 { _id: { $ne: loggedInUser._id } },
                 { _id: { $nin: Array.from(hideUsersFromFeed) } }
             ]
-        }).select("firstName lastName age about skills gender").skip(skip).limit(limit);
+        }).select("firstName lastName age about skills gender photoUrl").skip(skip).limit(limit);
 
         res.send(users);
     }
     catch (err) {
         res.status(400).json({
-            message : err.message
+            message: err.message
         })
     }
 })
