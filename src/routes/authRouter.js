@@ -32,16 +32,20 @@ authRouter.post('/signup', async (req, res) => {
             about
         })
 
-        await newUser.save();
+        const savedUser = await newUser.save();
+
+        const token = await jwt.sign({ _id: savedUser._id }, "Secure!@$1560", { expiresIn: '1d' });
+        res.cookie("token", token);
 
         res.json({
-            "message": "User added successfully!"
+            message: "User added successfully!",
+            user: savedUser
         })
 
     }
     catch (err) {
         res.status(400).json({
-            "message": err.message
+            message: err.message
         })
     }
 })
@@ -74,7 +78,7 @@ authRouter.post('/login', async (req, res) => {
         res.cookie("token", token);
         res.json({
             "message": "User logged in successfully!",
-            user : existingUser
+            user: existingUser
         })
 
     }
