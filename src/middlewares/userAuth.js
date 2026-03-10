@@ -10,7 +10,7 @@ const userAuth = async (req,res,next)=>{
             })
         }
         else{
-            const decodedPayload = jwt.verify(token,"Secure!@$1560");
+            const decodedPayload = jwt.verify(token,process.env.JWT_SECRET_KEY);
             const {_id} = decodedPayload;
 
             const existingUser = await User.findById(_id);

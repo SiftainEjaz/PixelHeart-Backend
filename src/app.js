@@ -7,16 +7,18 @@ const { profileRouter } = require('./routes/profileRouter.js');
 const { connectionRequestRouter } = require('./routes/connectionRequestRouter.js');
 const { userRouter } = require('./routes/userRouter.js');
 
+require('dotenv').config();
+
 const app = express();
 app.use(cors({
-    origin : "http://localhost:5173",
+    origin : "https://pixelheart.in",
     credentials : true
 }));
 
 app.use(express.json());
 app.use(cookieParser());
 
-const PORT = 2222;
+const PORT = process.env.PORT;
 
 app.use('/', authRouter);
 app.use('/profile', profileRouter);

@@ -34,7 +34,7 @@ authRouter.post('/signup', async (req, res) => {
 
         const savedUser = await newUser.save();
 
-        const token = await jwt.sign({ _id: savedUser._id }, "Secure!@$1560", { expiresIn: '1d' });
+        const token = await jwt.sign({ _id: savedUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' });
         res.cookie("token", token);
 
         res.json({
@@ -73,7 +73,7 @@ authRouter.post('/login', async (req, res) => {
             throw new Error("Incorrect credentials!");
         }
 
-        const token = jwt.sign({ _id: existingUser._id }, "Secure!@$1560", { expiresIn: "1d" });
+        const token = jwt.sign({ _id: existingUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
 
         res.cookie("token", token);
         res.json({
